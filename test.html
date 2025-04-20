@@ -71,29 +71,43 @@
     const resultArea = document.getElementById("resultArea");
 
     const testData = JSON.parse(localStorage.getItem("tests") || "[]");
-
     const latestTest = testData[testData.length - 1];
+
     if (!latestTest) {
       testArea.innerHTML = "<p>❌ Тест табылмады.</p>";
     } else {
       latestTest.data.forEach((q, idx) => {
         const block = document.createElement("div");
         block.className = "question";
-        block.innerHTML = "<h3>" + (idx + 1) + ". " + q.question + "</h3>";
+
+        const questionTitle = document.createElement("h3");
+        questionTitle.innerText = (idx + 1) + ". " + q.question;
+        block.appendChild(questionTitle);
+
+        const answersWrapper = document.createElement("div");
+        answersWrapper.className = "answers";
 
         q.answers.forEach((ans, i) => {
           const id = `q${idx}_a${i}`;
-          block.innerHTML += `
-            <label><input type="radio" name="q${idx}" value="${i}" id="${id}" style="padding: 8px; margin: 4px; min-width: 120px;"> ${ans}</label>
-          `;
+          const label = document.createElement("label");
+
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = `q${idx}`;
+          input.value = i;
+          input.id = id;
+
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(" " + ans));
+          answersWrapper.appendChild(label);
         });
 
+        block.appendChild(answersWrapper);
         testArea.appendChild(block);
       });
     }
 
     function submitTest() {
-      const formData = new FormData();
       let score = 0;
       latestTest.data.forEach((q, idx) => {
         const chosen = document.querySelector(`input[name="q${idx}"]:checked`);
